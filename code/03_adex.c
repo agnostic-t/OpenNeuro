@@ -1,5 +1,5 @@
 /*
- * Illustrates Exponential Integrate-and-Fire algorithm
+ * Illustrates Adaptive Exponential Integrate-and-Fire algorithm
  * on single neuron
  */
 
@@ -10,11 +10,18 @@
 
 #include "gnuplot/gnuplot_i.h"
 
-float EIF_dv_dt(
-    float v, float i_ext,
+float AdEx_dv_dt(
+    float v, float i_ext, float w,
     float c_m, float g_L, float dt_T, float e_L, float v_t
 ) {
-    return (-g_L * (v - e_L) + g_L * dt_T * exp((v - v_t) / dt_T) + i_ext) / c_m;
+    return (-g_L * (v - e_L) + g_L * dt_T * expf((v - v_t) / dt_T) - w + i_ext) / c_m;
+}
+
+float AdEx_dw_dt(
+    float w, float v,
+    float tau_w, float e_L, float a
+) {
+    return (a * (v - e_L) - w) / tau_w;
 }
 
 void plot(double x[], double y[], size_t dots);
@@ -30,12 +37,24 @@ int main() {
     float v_peak = 20.f;   // Voltage at spike moment (in mV)
     float tau_r = 2;       // Resting time after spike (in ms)
 
-    float v = e_L;
-    float i_ext = 200.0f;   // Input voltage (nA), at least 200 nA
+    float tau_w = 144.f;   // Time for relaxation (in ms)
+    float a = 4.f;         // Subthreshold adaptation (nS)
+    float b = 80.f;        // Spike of adaption after voltage spike (nA)
+
+    float w = 0.f;         // Adaptaion current (nA)
+    float v = e_L;         // Voltage (мВ)
+    float i_ext = 500.0f;  // External current, for spikes higher than in EIF (nA)
 
     int in_rest = -1;
     double x[SIM_STEPS], y[SIM_STEPS];
     for (int i = 0; i < SIM_STEPS; i++){
+        float dw_dt = AdEx_dw_dt(
+            w, v,
+            tau_w, e_L, a
+        );
+
+        w += dw_dt * euler_dt;
+
         if (in_rest > 0) {
             in_rest --;
 
@@ -44,12 +63,17 @@ int main() {
             continue;
         }
 
-        float dv_dt = EIF_dv_dt(v, i_ext, c_m, g_L, dt_T, e_L, v_t);
+        float dv_dt = AdEx_dv_dt(
+            v, i_ext, w,
+            c_m, g_L, dt_T, e_L, v_t
+        );
+
         v += dv_dt * euler_dt;
 
         if (v >= v_peak) {
             y[i] = v_peak;
             v = v_rest;
+            w += b;
 
             in_rest = (int)(tau_r / euler_dt);
         } else {
