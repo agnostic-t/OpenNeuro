@@ -1,5 +1,9 @@
 .obsidian
 .trash
 .dev
+.cache
+
+compile_commands.json
+framework/openneuro/include
+
 bin
-wiki
