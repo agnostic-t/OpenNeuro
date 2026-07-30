@@ -161,7 +161,7 @@ int izhikevich_test() {
         if (izh_is_spiked(&nr, &nvec))
             v = IZHIKEVICH_TRESHOLD;
         else
-            v = hh_vec(&nvec)->v;
+            v = izh_vec(&nvec)->v;
 
         x[i] = i * 0.1;
         y[i] = (double)v;
