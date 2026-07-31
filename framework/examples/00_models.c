@@ -1,13 +1,13 @@
 #include "gnuplot/gnuplot_i.h"
 
-#include "abstract.h"
-#include "watcher.h"
+#include "openneu/abstract.h"
+#include "openneu/watcher.h"
 
-#include "lif.h"
-#include "eif.h"
-#include "adex.h"
-#include "izhikevich.h"
-#include "hodjkin_haxly.h"
+#include "openneu/lif.h"
+#include "openneu/eif.h"
+#include "openneu/adex.h"
+#include "openneu/izhikevich.h"
+#include "openneu/hodjkin_haxly.h"
 
 #define SIM_STEPS 1000
 

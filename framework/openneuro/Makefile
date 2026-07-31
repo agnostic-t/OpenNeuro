@@ -11,6 +11,6 @@ cleanup:
 
 extract:
 	mkdir -p ./bin/
-	mkdir -p ./include/
+	mkdir -p ./include/openneu
 	find . -path "./bin" -prune -o -name "*.a" -exec cp {} bin/ \;
-	find . -path "./include" -prune -o -name "*.h" -exec cp {} include/ \;
+	find . -path "./include" -prune -o -name "*.h" -exec cp {} include/openneu/ \;
